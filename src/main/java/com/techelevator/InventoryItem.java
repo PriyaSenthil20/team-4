@@ -79,7 +79,7 @@ public class InventoryItem {
                 inventoryItemList.add(new InventoryItem(lineInput[0],lineInput[1],lineInput[2],lineInput[3]));
             }
         }catch (FileNotFoundException fileNotFoundException){
-            System.out.println("File not Found in the give path");
+            System.out.println("File not found in the given path");
         }
         return inventoryItemList;
     }
