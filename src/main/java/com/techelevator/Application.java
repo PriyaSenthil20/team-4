@@ -7,6 +7,8 @@ public class Application {
 		int variable = 0;
 
 		System.out.println("Hello World!");
+		VendingMachine vm=new VendingMachine();
+		vm.displayInventory();
 
 
 	}

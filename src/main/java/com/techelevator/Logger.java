@@ -11,11 +11,13 @@ import java.time.format.DateTimeFormatter;
 public class Logger {
     private LocalDate fileDate= LocalDate.now();
     private File inputFile;
-    public Logger() throws IOException {
+    public Logger() {
         inputFile=getLogFile(fileDate+"-log.log");
     }
-    public File getLogFile(String path) throws IOException {
+    public File getLogFile(String path) {
+
         File inputFile=new File(path);
+        try{
         if(!inputFile.exists()){
             inputFile.createNewFile();
             return inputFile;
@@ -24,9 +26,12 @@ public class Logger {
             System.out.println(path+" is not a file.");
             return null;
         }
+        }catch (IOException e){
+            System.out.println(e.getMessage());
+        }
         return inputFile;
     }
-    public void writeLogEntry(String message)throws IOException{
+    public void writeLogEntry(String message){
         LocalDate messageDate=LocalDate.now();
         LocalTime currentTime=LocalTime.now();
         DateTimeFormatter formatter=DateTimeFormatter.ofPattern("HH.mm.ss");
@@ -36,8 +41,8 @@ public class Logger {
             writer.append(messageDate+" - "+message+" - "+timeString+"\n");
             writer.flush();
         }
-        catch (Exception e){
-            throw new IOException();
+        catch (IOException e){
+            System.out.println(e.getMessage());
         }
     }
 }
