@@ -29,7 +29,7 @@ public class InventoryItem {
         if(this.numberOfItemsRemaining==0){
             inventoryItemsToDisplay.put(id, "Name: " + name + " Price: " + price + " Category: " + edibleCategory + " Sold Out");
         }else {
-            inventoryItemsToDisplay.put(id, "Name: " + name + " Price: " + price + " Category: " + edibleCategory + " Number Of Items Available: " + numberOfItemsRemaining);
+            inventoryItemsToDisplay.put(id, "Name: " + name + " Price: " + price + " Category: " + edibleCategory + " Quantity Available: " + numberOfItemsRemaining);
         }
     }
 
@@ -64,8 +64,12 @@ public class InventoryItem {
         inventoryItemSelected.numbersSold+=numbersSold;
         inventoryItemsToDispense.put(id,"Name: "+name+" Price: "+price+" Category: "+edibleCategory+" numberOfItemsSold: "+numbersSold);
     }
-    public void dispenseItem(InventoryItem inventoryItem,int numbersSelected){
-
+    public InventoryItem dispenseItem(InventoryItem inventoryItem,int quantity){
+        inventoryItem.numberOfItemsRemaining-=quantity;
+        inventoryItem.numbersSold=quantity;
+        inventoryItemsToDispense.put(inventoryItem.id,inventoryItem.getInventoryItemsToDisplay().get(inventoryItem.id)+quantity);
+        System.out.println("item dispensed: "+inventoryItem.id);
+        return inventoryItem;
     }
     public List<InventoryItem> getInventoryItemList(){
         File inventoryFile=new File("vendingmachine.csv");
@@ -78,5 +82,20 @@ public class InventoryItem {
             System.out.println("File not Found in the give path");
         }
         return inventoryItemList;
+    }
+    InventoryItem getSelectedItem(String id) {
+        for (InventoryItem output : inventoryItemList) {
+            if (output.getId().equalsIgnoreCase(id)) {
+                return output;
+            }
+        }
+        return null;
+    }
+    public List<String> getAllIds(){
+        List<String> allIds=new ArrayList<>();
+        for(String id:inventoryItemsToDisplay.keySet()){
+            allIds.add(id);
+        }
+        return allIds;
     }
 }

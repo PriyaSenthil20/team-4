@@ -15,7 +15,7 @@ public class Application {
 	public void run() {
 		String activeMenu = "main";
 		int menuOption;
-		BigDecimal currentBalance = new BigDecimal("0.00");
+		BigDecimal currentBalance = new BigDecimal("10.00");
 		VendingMachine vm = new VendingMachine();
 		boolean exitProgram = false;
 
@@ -45,6 +45,8 @@ public class Application {
 						break;
 					case 2:
 						System.out.println("Select product.");
+						vm.selectProduct();
+
 						//Call select product method from here
 						break;
 					case 3:
@@ -56,4 +58,5 @@ public class Application {
 			}
 		}
 	}
+
 }
