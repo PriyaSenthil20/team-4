@@ -73,6 +73,7 @@ public class InventoryItem {
     }
     public List<InventoryItem> getInventoryItemList(){
         File inventoryFile=new File("vendingmachine.csv");
+
         try(Scanner fileLine=new Scanner(inventoryFile)){
             while(fileLine.hasNext()){
                 String[] lineInput=fileLine.nextLine().split("\\|");

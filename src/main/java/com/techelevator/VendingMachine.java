@@ -1,5 +1,7 @@
 package com.techelevator;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.math.BigDecimal;
 import java.util.*;
 
@@ -24,6 +26,7 @@ public class VendingMachine extends InventoryItem implements Edible {
 
     public VendingMachine() {
         currentBalance = new BigDecimal("0.00");
+        inventoryItemList = getInventoryItemList();
     }
     public VendingMachine(String message){
         this.message=message;
@@ -34,9 +37,9 @@ public class VendingMachine extends InventoryItem implements Edible {
     public void updateBalance(BigDecimal price,int quantity){
 
     }
-    public void displayInventory(){
-//        System.out.println("Welcome to Vendo Mat: ");
 
+    //Inventory methods
+    public void displayInventory(){
         for(InventoryItem inventoryItem:inventoryItemList){
             Map<String,String> product=inventoryItem.getInventoryItemsToDisplay();
             for(String id:product.keySet()) {
