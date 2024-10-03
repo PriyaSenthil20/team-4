@@ -1,22 +1,28 @@
 package com.techelevator;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
 
 public class VendingMachine extends InventoryItem implements Edible {
     private String message;
-    private Map<String,String> inventoryItem=getInventoryItemsToDisplay();
+    private Map<String,String> inventoryItem = getInventoryItemsToDisplay();
     Logger log=new Logger();
     private BigDecimal customerFeedMoney;
     private BigDecimal currentBalance;
     //private BigDecimal totalSales;
     private List<InventoryItem> inventoryItemSelected;
+    private final int QUARTER_VALUE = 25;
+    private final int DIME_VALUE = 10;
+    private final int NICKEL_VALUE = 5;
+    private int[] coinValues = {QUARTER_VALUE, DIME_VALUE, NICKEL_VALUE};
+    private String[] coinTypes = {"quarter", "dime", "nickel"};
+    private List<Integer> coinsDue;
+
+    private String activeMenu = "main";
 
     public VendingMachine(){
-        this.inventoryItemSelected = getInventoryItemList();
+//      this.inventoryItemSelected = getInventoryItemList();
+        currentBalance = new BigDecimal("0.00");
     }
     public VendingMachine(String message){
         this.message=message;
@@ -56,7 +62,7 @@ public class VendingMachine extends InventoryItem implements Edible {
     }
 
     //Money methods
-    public BigDecimal feedMoney(BigDecimal currentBalance) {
+    public void feedMoney() {
         Scanner userInput = new Scanner(System.in);
         boolean isFeedingMoney = true;
 
@@ -65,11 +71,12 @@ public class VendingMachine extends InventoryItem implements Edible {
             String moneyAddedAsStr = userInput.nextLine();
             if (moneyAddedAsStr.matches("\\d+")) {
                 BigDecimal moneyAdded = new BigDecimal(moneyAddedAsStr);
-                currentBalance = currentBalance.add(moneyAdded);
+                this.setCurrentBalance(currentBalance.add(moneyAdded));
             } else {
                 System.out.println("Invalid input. Please enter a whole number.");
                 continue;
             }
+
             System.out.println("Thank you! Please press (1) to continue feeding money or (2) to return to the Purchase menu.");
             String continueOption = userInput.nextLine();
             while(isFeedingMoney) {
@@ -83,10 +90,35 @@ public class VendingMachine extends InventoryItem implements Edible {
                 }
             }
         }
+    }
 
+    public void dispenseChange() {
+        coinsDue = new ArrayList<>();
 
-        return currentBalance;
+        if (currentBalance.compareTo(BigDecimal.valueOf(0)) > 0) {
+            System.out.println("Change due: " + currentBalance);
+            int currentBalanceInCents = currentBalance.movePointRight(2).intValue();
+            for (int coinValue : coinValues) {
+                coinsDue.add(currentBalanceInCents / coinValue);
+                currentBalanceInCents = currentBalanceInCents % coinValue;
+            }
+            System.out.println("Your change has been dispensed as the following: ");
+            for (int i = 0; i < coinsDue.size(); i++) {
+                if (coinsDue.get(i) == 0) {
+                    continue;
+                }
+                String coinTypeDue = coinsDue.get(i) > 1 ? coinTypes[i] + "s" : coinTypes[i];
+                System.out.println("\t" + coinsDue.get(i) + " " + coinTypeDue);
+            }
 
+            if (currentBalanceInCents > 1) {
+                System.out.println("\t" + currentBalanceInCents + " pennies");
+            } else if (currentBalanceInCents == 1) {
+                System.out.println("\t 1 penny");
+            }
+
+            System.out.println();
+        }
     }
 
     public BigDecimal getCurrentBalance() {
@@ -95,5 +127,13 @@ public class VendingMachine extends InventoryItem implements Edible {
 
     public void setCurrentBalance(BigDecimal currentBalance) {
         this.currentBalance = currentBalance;
+    }
+
+    public String getActiveMenu() {
+        return activeMenu;
+    }
+
+    public void setActiveMenu(String activeMenu) {
+        this.activeMenu = activeMenu;
     }
 }
