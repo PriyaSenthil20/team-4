@@ -41,7 +41,7 @@ public class Application {
 						vm.feedMoney();
 						break;
 					case 2:
-						System.out.println("Select product.");
+						vm.selectProduct();
 						break;
 					case 3:
 						System.out.println("Thank you for using the Vendo-Matic 800.");
@@ -52,4 +52,5 @@ public class Application {
 			}
 		}
 	}
+
 }
