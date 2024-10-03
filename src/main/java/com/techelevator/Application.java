@@ -16,6 +16,7 @@ public class Application {
 		String activeMenu = "main";
 		int menuOption;
 		BigDecimal currentBalance = new BigDecimal("0.00");
+		VendingMachine vm = new VendingMachine();
 		boolean exitProgram = false;
 
 		while(!exitProgram) {
@@ -23,8 +24,7 @@ public class Application {
 			if (activeMenu.equals("main")) {
 				switch (menuOption) {
 					case 1:
-						System.out.println("Display inventory here.");
-						//Call display inventory method from here
+						vm.displayInventory();
 						break;
 					case 2:
 						activeMenu = "purchase";
@@ -41,7 +41,7 @@ public class Application {
 			} else {
 				switch (menuOption) {
 					case 1:
-						currentBalance = feedMoney(currentBalance);
+						currentBalance = vm.feedMoney(currentBalance);
 						break;
 					case 2:
 						System.out.println("Select product.");
@@ -55,43 +55,5 @@ public class Application {
 				}
 			}
 		}
-	}
-
-	public BigDecimal feedMoney(BigDecimal currentBalance) {
-		Scanner userInput = new Scanner(System.in);
-		boolean isFeedingMoney = true;
-
-
-		System.out.println("Hello World!");
-		VendingMachine vm=new VendingMachine();
-		vm.displayInventory();
-
-		while(isFeedingMoney) {
-			System.out.println("Please enter the number of dollars you would like to add as a whole number: ");
-			String moneyAddedAsStr = userInput.nextLine();
-			if (moneyAddedAsStr.matches("\\d+")) {
-				BigDecimal moneyAdded = new BigDecimal(moneyAddedAsStr);
-				currentBalance = currentBalance.add(moneyAdded);
-			} else {
-				System.out.println("Invalid input. Please enter a whole number.");
-				continue;
-			}
-			System.out.println("Thank you! Please press (1) to continue feeding money or (2) to return to the Purchase menu.");
-			String continueOption = userInput.nextLine();
-			while(isFeedingMoney) {
-				if (continueOption.equals("1")) {
-					break;
-				} else if (continueOption.equals("2")) {
-					isFeedingMoney = false;
-				} else {
-					System.out.println("Invalid input. Please press (1) to continue feeding money or (2) to return to the Purchase menu.");
-					continueOption = userInput.nextLine();
-				}
-			}
-		}
-
-
-		return currentBalance;
-
 	}
 }
