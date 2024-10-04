@@ -94,19 +94,10 @@ public class VendingMachine {
                 BigDecimal price = itemSelected.getPrice();
                 if (currentBalance.compareTo(price) != -1) {
                     dispenseItem(itemSelected, quantity);
-<<<<<<< HEAD
                     BigDecimal totalSale = price.multiply(BigDecimal.valueOf(quantity));
                     totalSales = totalSales.add(itemSelected.getPrice().multiply(BigDecimal.valueOf(quantity)));
                     currentBalance = currentBalance.subtract(totalSale);
                     logger.writeLogEntry("Items Selected:" + itemSelected.getName() + " Quantity: " + quantity);
-||||||| 8e9293f
-
-                    updateBalance(new BigDecimal(itemSelected.getPrice()), quantity);
-                    log.writeLogEntry("Items Selected:" + itemSelected.getName() + " Quantity: " + quantity);
-=======
-                    updateBalance(new BigDecimal(itemSelected.getPrice()), quantity);
-                    log.writeLogEntry("Items Selected:" + itemSelected.getName() + " Quantity: " + quantity);
->>>>>>> bd8f3fb3dbbccdb3d15184fcbb72c0430b79dfef
                 } else {
                     System.out.println("You do not have enough balance at this point of time for requested item and quantity! \nPlease feed more money or make different order!");
                 }
