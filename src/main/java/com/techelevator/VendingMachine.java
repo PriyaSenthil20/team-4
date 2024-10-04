@@ -42,6 +42,7 @@ public class VendingMachine {
 
         return output;
     }
+    
     public List<InventoryItem> getInventoryItemList() {
         File inventoryFile = new File("vendingmachine.csv");
 
@@ -182,6 +183,7 @@ public class VendingMachine {
         System.out.println("\n**TOTAL SALES** $" + totalSales);
     }
 
+    //Getters and setters
     public BigDecimal getCurrentBalance() {
         return currentBalance;
     }
