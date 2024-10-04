@@ -1,17 +1,15 @@
 package com.techelevator;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.math.BigDecimal;
 import java.util.*;
 
-public class VendingMachine extends InventoryItem {
+public class VendingMachine extends InventoryItem implements Edible {
     Scanner userInput=new Scanner(System.in);
     private String message;
     private Map<String,String> inventoryItem = getInventoryItemsToDisplay();
     Logger log=new Logger();
-    private BigDecimal customerFeedMoney=new BigDecimal("10.00");
-    private BigDecimal currentBalance=new BigDecimal("10.00");
+    private BigDecimal customerFeedMoney;
+    private BigDecimal currentBalance;
     //private BigDecimal totalSales;
     private List<InventoryItem> inventoryItemList;
     private List<InventoryItem> inventoryItemSelected;
@@ -26,7 +24,6 @@ public class VendingMachine extends InventoryItem {
 
     public VendingMachine() {
         currentBalance = new BigDecimal("0.00");
-        inventoryItemList = getInventoryItemList();
     }
     public VendingMachine(String message){
         this.message=message;
@@ -37,54 +34,48 @@ public class VendingMachine extends InventoryItem {
     public void updateBalance(BigDecimal price,int quantity){
 
     }
-
-
-    //Inventory methods
     public void displayInventory(){
+//        System.out.println("Welcome to Vendo Mat: ");
 
         for(InventoryItem inventoryItem:inventoryItemList){
             Map<String,String> product=inventoryItem.getInventoryItemsToDisplay();
-            int quantityLeft=inventoryItem.getQuantityRemaining();
             for(String id:product.keySet()) {
-                if(quantityLeft>0) {
-                    System.out.println(id + "   " + product.get(id) + "    " + quantityLeft + "\n");
-                }
-                else if(quantityLeft==0){
-                    System.out.println(id + "   " + product.get(id) + " Sold Out " + "\n");
-                }
+                   System.out.println( id + " "+product.get(id));
             }
         }
     }
-
 
     public void selectProduct() {
         displayInventory();
-        System.out.println("Select 1 product ID: (example A1)");
-        String productID = userInput.nextLine();
-        if (isValidId(productID)) {
-            System.out.println("Enter the quantity needed: (Numbers only)");
-            int quantity = userInput.nextInt();
+        String productID = userInput.nextLine().toUpperCase().trim();
+        System.out.println("Enter the quantity needed: (Numbers only)");
+        int quantity = userInput.nextInt();
+        while (getAllIds().contains(productID)) {
             InventoryItem itemSelected = getSelectedItem(productID);
-            if (itemSelected.getQuantityRemaining() >= quantity) {
-                BigDecimal price = new BigDecimal(itemSelected.getPrice());
-                if (customerFeedMoney.compareTo(price) != -1) {
-                    dispenseItem(itemSelected, quantity);
-
-                    updateBalance(new BigDecimal(itemSelected.getPrice()), quantity);
-                    log.writeLogEntry("Items Selected:" + itemSelected.getName() + " Quantity: " + quantity);
-                } else {
-                    System.out.println("You do not have enough balance at this point of time for requested item and quantity! \nPlease feed more money or make different order!");
-                }
-            } else {
-                System.out.println("Quantity requested for this item is not Available at this point of time!\nPlease change your order!");
-
-            }
+            selectProduct(itemSelected, quantity);
         }
-        else{
-            System.out.println("Enter valid product number");
-        }
+
     }
+    public InventoryItem selectProduct(InventoryItem itemsSelected,int itemQuantity){
 
+            if(itemsSelected.getNumberOfItemsRemaining()>=itemQuantity){
+                BigDecimal price=new BigDecimal(Integer.parseInt(itemsSelected.getPrice()));
+                if(customerFeedMoney.compareTo(price)!=-1){
+                    dispenseItem(itemsSelected,itemQuantity);
+                    updateBalance(new BigDecimal(itemsSelected.getPrice()),itemQuantity);
+                    log.writeLogEntry("Items Selected:"+itemsSelected.getName()+" Quantity: "+itemQuantity);
+                    return itemsSelected;
+                }
+                else{
+                    System.out.println("You do not have enough balance at this point of time for requested item and quantity! \nPlease feed more money or make different order!");
+                    return null;
+                }
+            }
+            else {
+                System.out.println("Quantity requested for this item is not Available at this point of time!\nPlease change your order!");
+                return null;
+            }
+    }
 
     //Money methods
     public void feedMoney() {

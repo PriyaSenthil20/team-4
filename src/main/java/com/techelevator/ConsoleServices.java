@@ -22,31 +22,35 @@ public class ConsoleServices {
 
     private static void  printPurchaseMenu(BigDecimal currentBalance) {
         int optionNumber = 1;
-        System.out.println("Current Money Provided: $" + currentBalance);
+        System.out.println("Current Money Provided: $" + currentBalance +"\n");
         for (String option : PURCHASE_MENU_OPTIONS) {
             System.out.println("\t(" + optionNumber + ") " + option);
             optionNumber++;
         }
     }
 
-    public static void printMenu(String activeMenu, BigDecimal currentBalance) {
+    public static void printMenu(VendingMachine vm) {
+        String activeMenu = vm.getActiveMenu();
+        BigDecimal currentBalance = vm.getCurrentBalance();
         if (activeMenu.equals("main")) {
             printMainMenu();
         } else if (activeMenu.equals("purchase")) {
             printPurchaseMenu(currentBalance);
         } else {
             System.out.println("Invalid active menu, returning to Main Menu.");
-            printMenu("main", currentBalance);
+            vm.setActiveMenu("main");
+            printMenu(vm);
         }
     }
 
-    public static int inputMenuOption(String activeMenu, BigDecimal currentBalance) {
+    public static int inputMenuOption(VendingMachine vm) {
         Scanner userInput = new Scanner(System.in);
         boolean isInputValid = false;
+        String activeMenu = vm.getActiveMenu();
         int menuOption = 1;
 
         while(!isInputValid) {
-            ConsoleServices.printMenu(activeMenu, currentBalance);
+            ConsoleServices.printMenu(vm);
             String menuOptionStr = userInput.nextLine();
 
             if (menuOptionStr.matches("\\d+")) {
@@ -59,13 +63,13 @@ public class ConsoleServices {
                 if (isValidMenuOption(1, 4, menuOption)) {
                     isInputValid = true;
                 } else {
-                    System.out.println("Invalid input. Please enter a number for one of the provided options.");
+                    System.out.println("Invalid input. Please enter a number corresponding to one of the provided options.");
                 }
             } else if (activeMenu.equals("purchase")) {
                 if (isValidMenuOption(1, 3, menuOption)) {
                     isInputValid = true;
                 } else {
-                    System.out.println("Invalid input. Please enter a number for one of the provided options.");
+                    System.out.println("Invalid input. Please enter a number corresponding to one of the provided options.");
                 }
             }
         }

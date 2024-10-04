@@ -13,44 +13,47 @@ public class Application {
 	}
 
 	public void run() {
-		String activeMenu = "main";
-		int menuOption;
-		BigDecimal currentBalance = new BigDecimal("10.00");
 		VendingMachine vm = new VendingMachine();
+		int menuOption;
 		boolean exitProgram = false;
 
 		while(!exitProgram) {
-			menuOption = ConsoleServices.inputMenuOption(activeMenu, currentBalance);
-			if (activeMenu.equals("main")) {
+			menuOption = ConsoleServices.inputMenuOption(vm);
+			if (vm.getActiveMenu().equals("main")) {
 				switch (menuOption) {
 					case 1:
 						vm.displayInventory();
 						break;
 					case 2:
-						activeMenu = "purchase";
+						vm.setActiveMenu("purchase");
 						break;
 					case 3:
 						exitProgram = true;
 						break;
 					case 4:
 						System.out.println("Display sales report here.");
-						//Call display sales report method from here
 						break;
 				}
 
 			} else {
 				switch (menuOption) {
 					case 1:
-						currentBalance = vm.feedMoney(currentBalance);
+						vm.feedMoney();
 						break;
 					case 2:
-						System.out.println("Select product.");
 						vm.selectProduct();
+
 						vm.salesReport();
 						break;
 					case 3:
 						System.out.println("Complete transaction.");
-						activeMenu = "main";
+						//activeMenu = "main";
+
+						break;
+					case 4:
+						System.out.println("Thank you for using the Vendo-Matic 800.");
+						vm.dispenseChange();
+						vm.setActiveMenu("main");
 						break;
 				}
 			}
