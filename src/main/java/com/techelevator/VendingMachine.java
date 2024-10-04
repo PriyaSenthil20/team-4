@@ -69,7 +69,6 @@ public class VendingMachine extends InventoryItem {
                 BigDecimal price = new BigDecimal(itemSelected.getPrice());
                 if (customerFeedMoney.compareTo(price) != -1) {
                     dispenseItem(itemSelected, quantity);
-
                     updateBalance(new BigDecimal(itemSelected.getPrice()), quantity);
                     log.writeLogEntry("Items Selected:" + itemSelected.getName() + " Quantity: " + quantity);
                 } else {

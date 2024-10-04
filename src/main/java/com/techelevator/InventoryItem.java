@@ -71,7 +71,7 @@ public class InventoryItem  {
         System.out.println("item dispensed: "+inventoryItem.id+" name: "+inventoryItem.name+" quantity: "+quantity);
         inventoryItem.numbersSold+=quantity;
         inventoryItemsToDispense.put(id,"Name: "+inventoryItem.name+" Price: "+inventoryItem.price+" Category: "+inventoryItem.edibleCategory+" quantitySold: "+quantity);
-        totalSales++;
+        totalSales+=quantity;
         ConsoleServices.displayMessage(inventoryItem.edibleCategory);
         salesReport.add("Item Dispensed: "+inventoryItem.id+" name: "+inventoryItem.name+" quantity: "+quantity);
         logger.writeLogEntry("Item Dispensed: "+inventoryItem.id+" name: "+inventoryItem.name+" quantity: "+quantity);
@@ -83,6 +83,7 @@ public class InventoryItem  {
     }
 
     void salesReport(){
+        System.out.println("Sales Report");
         for(String item:salesReport){
             System.out.println(salesReport);
         }
