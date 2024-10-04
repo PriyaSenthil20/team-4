@@ -4,7 +4,7 @@ import java.io.FileNotFoundException;
 import java.math.BigDecimal;
 import java.util.*;
 
-public class InventoryItem {
+public class InventoryItem  {
     private String id;
     private String name;
     private String price;
@@ -12,25 +12,40 @@ public class InventoryItem {
     private final int MAX_SLOT_CAPACITY=5;
     private List<InventoryItem> inventoryItemList=new ArrayList<>();
     private Map<String,String> inventoryItemsToDisplay =new HashMap<>();
+    private Map<String,Integer> itemIdWithQuantityRemaining=new HashMap<>();
     private Map<String,String> inventoryItemsToDispense =new HashMap<>();
+    private List<String> salesReport=new ArrayList<>();
+    private static List<String> allIdsList=new ArrayList<>();
     private final int MAXIMUM_SLOT_CAPACITY=5;
     private int numbersSelected=0;
     private int numbersSold=0;
-    private int numberOfItemsRemaining=MAXIMUM_SLOT_CAPACITY-numbersSold;
+    private int quantityRemaining=MAXIMUM_SLOT_CAPACITY;
+    private Logger logger=new Logger();
 
     public InventoryItem(){}
 
+    public int getMAX_SLOT_CAPACITY() {
+        return MAX_SLOT_CAPACITY;
+    }
 
-    public InventoryItem(String id, String name, String price,String edibleCategory){
+    public InventoryItem(String id, String name, String price, String edibleCategory){
         this.id=id;
+        allIdsList.add(id);
         this.name=name;
         this.price=price;
         this.edibleCategory=edibleCategory;
-        if(this.numberOfItemsRemaining==0){
-            inventoryItemsToDisplay.put(id, "Name: " + name + " Price: " + price + " Category: " + edibleCategory + " Sold Out");
-        }else {
-            inventoryItemsToDisplay.put(id, "Name: " + name + " Price: " + price + " Category: " + edibleCategory + " Quantity Available: " + numberOfItemsRemaining);
-        }
+        this.itemIdWithQuantityRemaining.put(this.id,this.quantityRemaining);
+        inventoryItemsToDisplay.put(id,  name + "      " + price + "      " + edibleCategory );
+
+
+    }
+
+    public Map<String, Integer> getItemIdWithQuantityRemaining() {
+        return itemIdWithQuantityRemaining;
+    }
+
+    public List<String> getSalesReport() {
+        return salesReport;
     }
 
     public Map<String,String> getInventoryItemsToDisplay(){
@@ -53,23 +68,35 @@ public class InventoryItem {
         return inventoryItemsToDispense;
     }
 
-    public int getNumberOfItemsRemaining() {
-        return numberOfItemsRemaining;
+    public int getQuantityRemaining() {
+        return this.quantityRemaining;
     }
 
     public boolean isInventoryItemAvailable(int numbersSelected){
         return MAXIMUM_SLOT_CAPACITY-this.numbersSold>=numbersSelected;
     }
-    public void updateInventoryItem(InventoryItem inventoryItemSelected,int numbersSold){
-        inventoryItemSelected.numbersSold+=numbersSold;
-        inventoryItemsToDispense.put(id,"Name: "+name+" Price: "+price+" Category: "+edibleCategory+" numberOfItemsSold: "+numbersSold);
-    }
+
     public InventoryItem dispenseItem(InventoryItem inventoryItem,int quantity){
-        inventoryItem.numberOfItemsRemaining-=quantity;
+        inventoryItem.quantityRemaining-=quantity;
         inventoryItem.numbersSold=quantity;
         inventoryItemsToDispense.put(inventoryItem.id,inventoryItem.getInventoryItemsToDisplay().get(inventoryItem.id)+quantity);
-        System.out.println("item dispensed: "+inventoryItem.id);
+        System.out.println("item dispensed: "+inventoryItem.id+" name: "+inventoryItem.name+" quantity: "+quantity);
+
+        inventoryItem.numbersSold+=quantity;
+        inventoryItem.quantityRemaining-=quantity;
+        inventoryItem.itemIdWithQuantityRemaining.put(inventoryItem.id,inventoryItem.quantityRemaining);
+        inventoryItemsToDispense.put(id,"Name: "+inventoryItem.name+" Price: "+inventoryItem.price+" Category: "+inventoryItem.edibleCategory+" quantitySold: "+quantity);
+        ConsoleServices.displayMessage(inventoryItem.edibleCategory);
+        salesReport.add("Item Dispensed: "+inventoryItem.id+" name: "+inventoryItem.name+" quantity: "+quantity);
+        logger.writeLogEntry("Item Dispensed: "+inventoryItem.id+" name: "+inventoryItem.name+" quantity: "+quantity);
         return inventoryItem;
+    }
+
+    void salesReport(){
+        for(String item:salesReport){
+            System.out.println(salesReport);
+        }
+
     }
     public List<InventoryItem> getInventoryItemList(){
         File inventoryFile=new File("vendingmachine.csv");
@@ -91,11 +118,12 @@ public class InventoryItem {
         }
         return null;
     }
-    public List<String> getAllIds(){
-        List<String> allIds=new ArrayList<>();
-        for(String id:inventoryItemsToDisplay.keySet()){
-            allIds.add(id);
+    public boolean isValidId(String userInputId){
+        for(String id:allIdsList){
+            if(userInputId.trim().equalsIgnoreCase(id)){
+                return true;
+            }
         }
-        return allIds;
+        return false;
     }
 }

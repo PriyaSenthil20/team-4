@@ -46,13 +46,11 @@ public class Application {
 					case 2:
 						System.out.println("Select product.");
 						vm.selectProduct();
-
-						//Call select product method from here
+						vm.salesReport();
 						break;
 					case 3:
 						System.out.println("Complete transaction.");
 						activeMenu = "main";
-						//Call complete transaction method from here
 						break;
 				}
 			}

@@ -1,5 +1,11 @@
 package com.techelevator;
 
-public interface Edible {
-    String getMessage();
+import java.io.PrintWriter;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+
+public class Edible {
+
+
 }

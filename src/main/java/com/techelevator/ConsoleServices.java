@@ -1,11 +1,15 @@
 package com.techelevator;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Scanner;
 
 public class ConsoleServices {
     private static final String[] MAIN_MENU_OPTIONS = {"Display Vending Machine Items", "Purchase", "Exit"};
     private static final String[] PURCHASE_MENU_OPTIONS = {"Feed Money", "Select Product", "Finish Transaction"};
+    private static Map<String,String> categoryMessage=new HashMap<>();
 
     private static void printMainMenu() {
         System.out.println("Welcome to the Vendo-Matic 800! Please select an option from the menu below:");
@@ -73,4 +77,20 @@ public class ConsoleServices {
         return choice >= min && choice <= max;
     }
 
+    public static void displayMessage(String category) {
+        switch (category.toLowerCase()) {
+            case "chip":
+                System.out.println("Crunch,Crunch, Yum!");
+                break;
+            case "drink":
+                System.out.println("Glug,Glug, Yum!");
+                break;
+            case "gum":
+                System.out.println("Chew Chew, Yum!");
+                break;
+            case "candy":
+                System.out.println("Munch,Munch, Yum!");
+                break;
+        }
+    }
 }
