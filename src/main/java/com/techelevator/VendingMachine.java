@@ -3,7 +3,6 @@ package com.techelevator;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.math.BigDecimal;
-import java.sql.SQLOutput;
 import java.util.*;
 
 public class VendingMachine {
@@ -42,7 +41,7 @@ public class VendingMachine {
 
         return output;
     }
-    
+
     public List<InventoryItem> getInventoryItemList() {
         File inventoryFile = new File("vendingmachine.csv");
 
@@ -60,45 +59,50 @@ public class VendingMachine {
     public void displayInventory(){
 
         for(InventoryItem inventoryItem:inventoryItemList){
-            int quantityLeft=inventoryItem.getQuantityRemaining();
+            int quantityLeft =  inventoryItem.getQuantityRemaining();
+            String quantityToPrint = "";
             String id = inventoryItem.getId();
 
                 if(quantityLeft>0) {
-                    System.out.println(id + " | " + inventoryItem.getName() + " " + inventoryItem.getPrice() + " " + inventoryItem.getEdibleCategory() + " " + quantityLeft + "\n");
+                    quantityToPrint += ", quantity available: " + quantityLeft;
+
                 }
                 else if(quantityLeft==0){
-                    System.out.println(id + " | " + inventoryItem.getName() + " " + inventoryItem.getPrice() +  " " + inventoryItem.getEdibleCategory() + " Sold Out! " + "\n");
+                    quantityToPrint += " SOLD OUT!";
                 }
+
+            System.out.println(id + " | " + inventoryItem.getName() + " (" + inventoryItem.getEdibleCategory() + ")" + ", $" + inventoryItem.getPrice() + quantityToPrint + "\n");
             }
         }
 
-    public InventoryItem dispenseItem(InventoryItem inventoryItem, int quantity) {
+    public void dispenseItem(InventoryItem inventoryItem, int quantity) {
         inventoryItem.setQuantityRemaining(inventoryItem.getQuantityRemaining() - quantity);
         inventoryItem.setNumbersSold(inventoryItem.getNumbersSold() + quantity);
 
-        System.out.println("Item dispensed: " + inventoryItem.getId() + " name: " + inventoryItem.getName() + " quantity: " + quantity);
+        System.out.println("Item dispensed: " + inventoryItem.getId() + " | " + inventoryItem.getName() + ", quantity: " + quantity);
 
         ConsoleServices.displayMessage(inventoryItem.getEdibleCategory());
-        logger.writeLogEntry("Item Dispensed: " + inventoryItem.getId() + " name: " + inventoryItem.getName() + " quantity: " + quantity);
-        return inventoryItem;
+        logger.writeLogEntry("Item dispensed: " + inventoryItem.getId() + " | " + inventoryItem.getName() + ", quantity: " + quantity);
     }
 
     public void selectProduct() {
         displayInventory();
-        System.out.println("Select 1 product ID: (example A1)");
-        String productID = userInput.nextLine();
+        //VALIDATING INPUT
+        System.out.println("Select a Product ID: (ex: A1)");
+        String productID = userInput.nextLine().toUpperCase();
         if (inventory.get(productID) != null) {
-            System.out.println("Enter the quantity needed: (Numbers only)");
+            //VALIDATING INPUT
+            System.out.println("How many would you like? (Please enter a whole number)");
             int quantity = userInput.nextInt();
             InventoryItem itemSelected = inventory.get(productID);
             if (itemSelected.getQuantityRemaining() >= quantity) {
-                BigDecimal price = itemSelected.getPrice();
+                BigDecimal price = itemSelected.getPrice().multiply(BigDecimal.valueOf(quantity));
                 if (currentBalance.compareTo(price) != -1) {
                     dispenseItem(itemSelected, quantity);
                     BigDecimal totalSale = price.multiply(BigDecimal.valueOf(quantity));
                     totalSales = totalSales.add(itemSelected.getPrice().multiply(BigDecimal.valueOf(quantity)));
                     currentBalance = currentBalance.subtract(totalSale);
-                    logger.writeLogEntry("Items Selected:" + itemSelected.getName() + " Quantity: " + quantity);
+//                    logger.writeLogEntry("Items Selected:" + itemSelected.getName() + " Quantity: " + quantity);
                 } else {
                     System.out.println("You do not have enough balance at this point of time for requested item and quantity! \nPlease feed more money or make different order!");
                 }
@@ -108,7 +112,7 @@ public class VendingMachine {
             }
         }
         else{
-            System.out.println("Enter valid product number");
+            System.out.println("Enter valid product ID.");
         }
     }
 
@@ -119,16 +123,17 @@ public class VendingMachine {
         boolean isFeedingMoney = true;
 
         while(isFeedingMoney) {
+            //VALIDATING INPUT
             System.out.println("Please enter the number of dollars you would like to add as a whole number: ");
             String moneyAddedAsStr = userInput.nextLine();
             if (moneyAddedAsStr.matches("\\d+")) {
                 BigDecimal moneyAdded = new BigDecimal(moneyAddedAsStr);
                 this.setCurrentBalance(currentBalance.add(moneyAdded));
             } else {
-                System.out.println("Invalid input. Please enter a whole number.");
+                System.out.println("I'm sorry, the Vendo-Matic 800 only accepts whole dollars. Please enter a whole number.");
                 continue;
             }
-
+            //VALIDATING INPUT
             System.out.println("Thank you! Please press (1) to continue feeding money or (2) to return to the Purchase menu.");
             String continueOption = userInput.nextLine();
             while(isFeedingMoney) {

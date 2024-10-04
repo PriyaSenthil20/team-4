@@ -22,7 +22,7 @@ public class ConsoleServices {
 
     private static void  printPurchaseMenu(BigDecimal currentBalance) {
         int optionNumber = 1;
-        System.out.println("Current Money Provided: $" + currentBalance +"\n");
+        System.out.println("Current Money Provided: $" + currentBalance);
         for (String option : PURCHASE_MENU_OPTIONS) {
             System.out.println("\t(" + optionNumber + ") " + option);
             optionNumber++;
