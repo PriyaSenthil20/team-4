@@ -31,7 +31,7 @@ public class Application {
 						exitProgram = true;
 						break;
 					case 4:
-						System.out.println("Display sales report here.");
+						vm.salesReport();
 						break;
 				}
 
@@ -42,15 +42,8 @@ public class Application {
 						break;
 					case 2:
 						vm.selectProduct();
-
-						vm.salesReport();
 						break;
 					case 3:
-						System.out.println("Complete transaction.");
-						//activeMenu = "main";
-
-						break;
-					case 4:
 						System.out.println("Thank you for using the Vendo-Matic 800.");
 						vm.dispenseChange();
 						vm.setActiveMenu("main");

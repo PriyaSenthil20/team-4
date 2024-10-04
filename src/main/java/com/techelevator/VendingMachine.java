@@ -3,75 +3,101 @@ package com.techelevator;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.math.BigDecimal;
+import java.sql.SQLOutput;
 import java.util.*;
 
-public class VendingMachine extends InventoryItem {
+public class VendingMachine {
     Scanner userInput=new Scanner(System.in);
     private String message;
-    private Map<String,String> inventoryItem = getInventoryItemsToDisplay();
-    Logger log=new Logger();
-    private BigDecimal customerFeedMoney=new BigDecimal("10.00");
-    private BigDecimal currentBalance=new BigDecimal("10.00");
-    //private BigDecimal totalSales;
-    private List<InventoryItem> inventoryItemList;
-    private List<InventoryItem> inventoryItemSelected;
+    private Map<String,InventoryItem> inventory;
+    private List<InventoryItem> inventoryItemList = new ArrayList<>();
+    private List<String> salesReport = new ArrayList<>();
+    private BigDecimal customerFeedMoney= new BigDecimal("0.00");
+    private BigDecimal currentBalance= new BigDecimal("0.00");
+    private static BigDecimal totalSales= new BigDecimal("0.00");
+
     private final int QUARTER_VALUE = 25;
     private final int DIME_VALUE = 10;
     private final int NICKEL_VALUE = 5;
     private int[] coinValues = {QUARTER_VALUE, DIME_VALUE, NICKEL_VALUE};
     private String[] coinTypes = {"quarter", "dime", "nickel"};
     private List<Integer> coinsDue;
+    private Logger logger=new Logger();
 
     private String activeMenu = "main";
 
     public VendingMachine() {
-        currentBalance = new BigDecimal("0.00");
-        inventoryItemList = getInventoryItemList();
+        this.inventory = getInventoryMap();
     }
-    public VendingMachine(String message){
-        this.message=message;
-    }
-    public String getMessage(){
-        return this.message;
-    }
-    public void updateBalance(BigDecimal price,int quantity){
-
-    }
-
 
     //Inventory methods
+    public Map<String,InventoryItem> getInventoryMap(){
+        Map<String, InventoryItem> output = new HashMap<>();
+
+        List<InventoryItem> inventoryItemList = getInventoryItemList();
+
+        for (InventoryItem item : inventoryItemList){
+            output.put(item.getId(), item);
+        }
+
+        return output;
+    }
+    public List<InventoryItem> getInventoryItemList() {
+        File inventoryFile = new File("vendingmachine.csv");
+
+        try(Scanner fileLine=new Scanner(inventoryFile)){
+            while(fileLine.hasNext()){
+                String[] lineInput=fileLine.nextLine().split("\\|");
+                inventoryItemList.add(new InventoryItem(lineInput[0],lineInput[1],lineInput[2],lineInput[3]));
+            }
+        }catch (FileNotFoundException fileNotFoundException){
+            System.out.println("File not found in the given path.");
+        }
+        return inventoryItemList;
+    }
+
     public void displayInventory(){
 
         for(InventoryItem inventoryItem:inventoryItemList){
-            Map<String,String> product=inventoryItem.getInventoryItemsToDisplay();
             int quantityLeft=inventoryItem.getQuantityRemaining();
-            for(String id:product.keySet()) {
+            String id = inventoryItem.getId();
+
                 if(quantityLeft>0) {
-                    System.out.println(id + "   " + product.get(id) + "    " + quantityLeft + "\n");
+                    System.out.println(id + " | " + inventoryItem.getName() + " " + inventoryItem.getPrice() + " " + inventoryItem.getEdibleCategory() + " " + quantityLeft + "\n");
                 }
                 else if(quantityLeft==0){
-                    System.out.println(id + "   " + product.get(id) + " Sold Out " + "\n");
+                    System.out.println(id + " | " + inventoryItem.getName() + " " + inventoryItem.getPrice() +  " " + inventoryItem.getEdibleCategory() + " Sold Out! " + "\n");
                 }
             }
         }
-    }
 
+    public InventoryItem dispenseItem(InventoryItem inventoryItem, int quantity) {
+        inventoryItem.setQuantityRemaining(inventoryItem.getQuantityRemaining() - quantity);
+        inventoryItem.setNumbersSold(inventoryItem.getNumbersSold() + quantity);
+
+        System.out.println("Item dispensed: " + inventoryItem.getId() + " name: " + inventoryItem.getName() + " quantity: " + quantity);
+
+        ConsoleServices.displayMessage(inventoryItem.getEdibleCategory());
+        logger.writeLogEntry("Item Dispensed: " + inventoryItem.getId() + " name: " + inventoryItem.getName() + " quantity: " + quantity);
+        return inventoryItem;
+    }
 
     public void selectProduct() {
         displayInventory();
         System.out.println("Select 1 product ID: (example A1)");
         String productID = userInput.nextLine();
-        if (isValidId(productID)) {
+        if (inventory.get(productID) != null) {
             System.out.println("Enter the quantity needed: (Numbers only)");
             int quantity = userInput.nextInt();
-            InventoryItem itemSelected = getSelectedItem(productID);
+            InventoryItem itemSelected = inventory.get(productID);
             if (itemSelected.getQuantityRemaining() >= quantity) {
-                BigDecimal price = new BigDecimal(itemSelected.getPrice());
-                if (customerFeedMoney.compareTo(price) != -1) {
+                BigDecimal price = itemSelected.getPrice();
+                if (currentBalance.compareTo(price) != -1) {
                     dispenseItem(itemSelected, quantity);
-
-                    updateBalance(new BigDecimal(itemSelected.getPrice()), quantity);
-                    log.writeLogEntry("Items Selected:" + itemSelected.getName() + " Quantity: " + quantity);
+                    BigDecimal totalSale = price.multiply(BigDecimal.valueOf(quantity));
+                    totalSales = totalSales.add(itemSelected.getPrice().multiply(BigDecimal.valueOf(quantity)));
+                    currentBalance = currentBalance.subtract(totalSale);
+                    logger.writeLogEntry("Items Selected:" + itemSelected.getName() + " Quantity: " + quantity);
                 } else {
                     System.out.println("You do not have enough balance at this point of time for requested item and quantity! \nPlease feed more money or make different order!");
                 }
@@ -133,6 +159,7 @@ public class VendingMachine extends InventoryItem {
                     continue;
                 }
                 String coinTypeDue = coinsDue.get(i) > 1 ? coinTypes[i] + "s" : coinTypes[i];
+
                 System.out.println("\t" + coinsDue.get(i) + " " + coinTypeDue);
             }
 
@@ -144,6 +171,15 @@ public class VendingMachine extends InventoryItem {
 
             System.out.println();
         }
+    }
+
+    //Logging and reporting methods
+    void salesReport(){
+        for(InventoryItem item:inventoryItemList){
+            System.out.println(">" + item.getName() + "|" + item.getNumbersSold());
+        }
+
+        System.out.println("\n**TOTAL SALES** $" + totalSales);
     }
 
     public BigDecimal getCurrentBalance() {
