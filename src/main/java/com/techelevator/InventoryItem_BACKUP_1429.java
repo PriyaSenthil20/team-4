@@ -42,9 +42,10 @@ public class InventoryItem  {
         return this.quantityRemaining;
     }
 
+<<<<<<< HEAD
     public void setQuantityRemaining(int quantityRemaining) {
         this.quantityRemaining = quantityRemaining;
-
+||||||| 8e9293f
     public boolean isInventoryItemAvailable(int numbersSelected){
         return MAXIMUM_SLOT_CAPACITY-this.numbersSold>=numbersSelected;
     }
@@ -94,11 +95,14 @@ public class InventoryItem  {
             System.out.println(salesReport);
         }
 
+=======
     void salesReport(){
         System.out.println("Sales Report");
         for(String item:salesReport){
             System.out.println(salesReport);
         }
+
+>>>>>>> bd8f3fb3dbbccdb3d15184fcbb72c0430b79dfef
     }
 
     public boolean isInventoryItemAvailable(int numbersSelected){
