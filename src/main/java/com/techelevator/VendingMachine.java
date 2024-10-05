@@ -13,11 +13,12 @@ public class VendingMachine {
     private final int QUARTER_VALUE = 25;
     private final int DIME_VALUE = 10;
     private final int NICKEL_VALUE = 5;
+    private int inventory_Size = 0;
     private int[] coinValues = {QUARTER_VALUE, DIME_VALUE, NICKEL_VALUE};
     private String[] coinTypes = {"quarter", "dime", "nickel"};
     private List<Integer> coinsDue;
     private Logger logger = new Logger();
-    private SalesReport salesReport;
+    private SalesReport salesReport=new SalesReport();
 
     private String activeMenu = "main";
 
@@ -46,6 +47,7 @@ public class VendingMachine {
                 String[] lineInput = fileLine.nextLine().split("\\|");
                 inventoryItemList.add(new InventoryItem(lineInput[0], lineInput[1], lineInput[2], lineInput[3]));
             }
+
         } catch (FileNotFoundException fileNotFoundException) {
             System.out.println("File not found in the given path.");
         }
@@ -135,12 +137,7 @@ public class VendingMachine {
     public void writeLogEntry(String message) {
         logger.writeLogEntry(message);
     }
-
-    void salesReport() {
-        salesReport = new SalesReport();
-        salesReport.writeSalesReport(inventoryItemList, totalSales);
-    }
-
+    
     //Getters and setters
     public BigDecimal getCurrentBalance() {
         return currentBalance;
@@ -157,5 +154,15 @@ public class VendingMachine {
     public void setActiveMenu(String activeMenu) {
         this.activeMenu = activeMenu;
     }
-
+    public void generateSalesReport(List<InventoryItem> updatedInventoryItems){
+        String reportMessage="";
+        for(InventoryItem item:updatedInventoryItems){
+            if(reportMessage.contains(item.getName())){
+                break;
+            }
+            reportMessage+=item.getName() + "|" + item.getNumbersSold() + "\n";
+        }
+        reportMessage+="\n**TOTAL SALES** $" + totalSales;
+        salesReport.writeSalesReport(reportMessage);
+    }
 }

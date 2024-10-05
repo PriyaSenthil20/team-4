@@ -15,21 +15,17 @@ import java.util.List;
 public class SalesReport extends FileGenerator {
         public SalesReport() {
             LocalTime localTime = LocalTime.now();
-            DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("hh-mm-ssa");
+            DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("hh-mm a");
             String timeString = localTime.format(dateTimeFormatter);
-
             inputFile=getReportFile(fileDate+"_"+timeString+"_SalesReport");
         }
         private File getReportFile(String path) {
             return super.getInputFile(path);
         }
-        public void writeSalesReport(List<InventoryItem> inventoryItemList, BigDecimal totalSales){
+        public void writeSalesReport(String message){
             try(FileWriter fileWriter=new FileWriter(this.inputFile.getName())){
                 PrintWriter writer=new PrintWriter(fileWriter);
-                for(InventoryItem item:inventoryItemList){
-                    writer.write(item.getName() + "|" + item.getNumbersSold() + "\n");
-                }
-                writer.write("\n**TOTAL SALES** $" + totalSales);
+                writer.append(message);
                 writer.flush();
             }
             catch (IOException e){
