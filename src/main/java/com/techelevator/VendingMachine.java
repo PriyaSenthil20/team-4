@@ -85,15 +85,9 @@ public class VendingMachine {
         logger.writeLogEntry("Item dispensed: " + inventoryItem.getId() + " | " + inventoryItem.getName() + ", quantity: " + quantity);
     }
 
-    public void selectProduct() {
-        displayInventory();
+    public void selectProduct(String productID,int quantity) {
+
         //VALIDATING INPUT
-        System.out.println("Select a Product ID: (ex: A1)");
-        String productID = userInput.nextLine().toUpperCase();
-        if (inventory.get(productID) != null) {
-            //VALIDATING INPUT
-            System.out.println("How many would you like? (Please enter a whole number)");
-            int quantity = userInput.nextInt();
             InventoryItem itemSelected = inventory.get(productID);
             if (itemSelected.getQuantityRemaining() >= quantity) {
                 BigDecimal price = itemSelected.getPrice().multiply(BigDecimal.valueOf(quantity));
@@ -102,7 +96,7 @@ public class VendingMachine {
                     BigDecimal totalSale = price.multiply(BigDecimal.valueOf(quantity));
                     totalSales = totalSales.add(itemSelected.getPrice().multiply(BigDecimal.valueOf(quantity)));
                     currentBalance = currentBalance.subtract(totalSale);
-//                    logger.writeLogEntry("Items Selected:" + itemSelected.getName() + " Quantity: " + quantity);
+                    //logger.writeLogEntry("Items Selected:" + itemSelected.getName() + " ");
                 } else {
                     System.out.println("You do not have enough balance at this point of time for requested item and quantity! \nPlease feed more money or make different order!");
                 }
@@ -110,12 +104,19 @@ public class VendingMachine {
                 System.out.println("Quantity requested for this item is not Available at this point of time!\nPlease change your order!");
 
             }
-        }
-        else{
-            System.out.println("Enter valid product ID.");
-        }
-    }
 
+    }
+    public boolean isValidProductId(String productId){
+        return getInventoryMap().get(productId)!=null ;
+    }
+    public boolean isValidQuantity(int quantity){
+      if(quantity>0&&quantity<6){
+          return true;
+      }
+      else {
+          return false;
+      }
+    }
 
     //Money methods
     public void feedMoney() {
@@ -204,4 +205,5 @@ public class VendingMachine {
     public void setActiveMenu(String activeMenu) {
         this.activeMenu = activeMenu;
     }
+
 }

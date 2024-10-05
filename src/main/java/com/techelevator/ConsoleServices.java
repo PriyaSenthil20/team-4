@@ -73,7 +73,6 @@ public class ConsoleServices {
                 }
             }
         }
-
         return menuOption;
 
     }
@@ -96,5 +95,25 @@ public class ConsoleServices {
                 System.out.println("Munch,Munch, Yum!");
                 break;
         }
+    }
+    public static void getInputForSelectProduct(VendingMachine vm){
+        Scanner userInput=new Scanner(System.in);
+
+        System.out.println("Select a Product ID: (ex: A1)");
+        String productID = userInput.nextLine().toUpperCase();
+
+        while(!vm.isValidProductId(productID)){
+            System.out.println("Please Enter the valid ProductId ");
+            productID=userInput.nextLine().toUpperCase().trim();
+        }
+        System.out.println("Enter the quantity required: (Whole numbers Please) ");
+        String quantityInput=userInput.nextLine().trim();
+        int quantity=Integer.parseInt(quantityInput);
+        while (!vm.isValidQuantity(quantity)){
+            System.out.println("Please enter valid quantity:(Whole Numbers Please)");
+            quantityInput=userInput.nextLine().trim();
+            quantity=Integer.parseInt(quantityInput);
+        }
+        vm.selectProduct(productID,quantity);
     }
 }

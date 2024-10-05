@@ -41,7 +41,8 @@ public class Application {
 						vm.feedMoney();
 						break;
 					case 2:
-						vm.selectProduct();
+						vm.displayInventory();
+						ConsoleServices.getInputForSelectProduct(vm);
 						break;
 					case 3:
 						System.out.println("Thank you for using the Vendo-Matic 800.");
