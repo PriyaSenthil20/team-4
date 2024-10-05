@@ -9,7 +9,6 @@ public class InventoryItem {
     private String name;
     private BigDecimal price;
     private String edibleCategory;
-    private final int MAX_SLOT_CAPACITY = 5;
     private final int MAXIMUM_SLOT_CAPACITY = 5;
     private int numbersSold = 0;
     private int quantityRemaining = MAXIMUM_SLOT_CAPACITY;

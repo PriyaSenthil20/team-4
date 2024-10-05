@@ -4,41 +4,32 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
+import java.util.List;
 
-public class SalesReport {
-        private LocalDate fileDate= LocalDate.now();
-        private static int SaleCount=1;
-        private File inputFile;
+public class SalesReport extends FileGenerator {
         public SalesReport() {
-            inputFile=getReportFile(fileDate+"-Sale-"+SaleCount+"-SalesReport");
-            SaleCount++;
-        }
-        public File getReportFile(String path) {
+            LocalTime localTime = LocalTime.now();
+            DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("hh-mm-ssa");
+            String timeString = localTime.format(dateTimeFormatter);
 
-            File inputFile=new File(path);
-            try{
-                if(!inputFile.exists()){
-                    inputFile.createNewFile();
-                    return inputFile;
-                }
-                else if (!inputFile.isFile()){
-                    System.out.println(path+" is not a file.");
-                    return null;
-                }
-            }catch (IOException e){
-                System.out.println(e.getMessage());
-            }
-            return inputFile;
+            inputFile=getReportFile(fileDate+"_"+timeString+"_SalesReport");
         }
-        public void writeSalesReport(String message){
-            try(FileWriter fileWriter=new FileWriter(this.inputFile.getName(),true)){
+        private File getReportFile(String path) {
+            return super.getInputFile(path);
+        }
+        public void writeSalesReport(List<InventoryItem> inventoryItemList, BigDecimal totalSales){
+            try(FileWriter fileWriter=new FileWriter(this.inputFile.getName())){
                 PrintWriter writer=new PrintWriter(fileWriter);
-                writer.append(message+"\n");
+                for(InventoryItem item:inventoryItemList){
+                    writer.write(item.getName() + "|" + item.getNumbersSold() + "\n");
+                }
+                writer.write("\n**TOTAL SALES** $" + totalSales);
                 writer.flush();
             }
             catch (IOException e){

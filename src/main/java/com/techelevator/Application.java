@@ -1,8 +1,5 @@
 package com.techelevator;
 
-import java.math.BigDecimal;
-import java.util.Scanner;
-
 public class Application {
 
 	public static void main(String[] args) {
@@ -32,17 +29,18 @@ public class Application {
 						break;
 					case 4:
 						vm.salesReport();
+						System.out.println("Sales report generated.");
 						break;
 				}
 
 			} else {
 				switch (menuOption) {
 					case 1:
-						vm.feedMoney();
+						ConsoleServices.inputMoney(vm);
 						break;
 					case 2:
 						vm.displayInventory();
-						ConsoleServices.getInputForSelectProduct(vm);
+						ConsoleServices.inputProductSelection(vm);
 						break;
 					case 3:
 						System.out.println("Thank you for using the Vendo-Matic 800.");

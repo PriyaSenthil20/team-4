@@ -10,28 +10,13 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
-public class Logger {
-    private LocalDate fileDate= LocalDate.now();
-    private File inputFile;
+public class Logger extends FileGenerator {
     public Logger() {
-        inputFile=getLogFile(fileDate+"-log.log");
+        inputFile = getLogFile(fileDate+"-log.log");
     }
-    public File getLogFile(String path) {
+    private File getLogFile(String path) {
 
-        File inputFile=new File(path);
-        try{
-        if(!inputFile.exists()){
-            inputFile.createNewFile();
-            return inputFile;
-        }
-        else if (!inputFile.isFile()){
-            System.out.println(path+" is not a file.");
-            return null;
-        }
-        }catch (IOException e){
-            System.out.println(e.getMessage());
-        }
-        return inputFile;
+        return super.getInputFile(path);
     }
     public void writeLogEntry(String message){
 
@@ -41,6 +26,7 @@ public class Logger {
         LocalTime localTime = LocalTime.now();
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("hh:mm:ss a");
         String timeString = localTime.format(dateTimeFormatter);
+
         try(FileWriter fileWriter=new FileWriter(this.inputFile.getName(),true)){
             PrintWriter writer=new PrintWriter(fileWriter);
             writer.append(messageDate+" "+timeString+" "+message+"\n");
