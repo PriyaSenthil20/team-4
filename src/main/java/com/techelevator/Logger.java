@@ -27,13 +27,9 @@ public class Logger extends FileGenerator {
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("hh:mm:ss a");
         String timeString = localTime.format(dateTimeFormatter);
 
-        try(FileWriter fileWriter=new FileWriter(this.inputFile.getName(),true)){
-            PrintWriter writer=new PrintWriter(fileWriter);
-            writer.append(messageDate+" "+timeString+" "+message+"\n");
-            writer.flush();
-        }
-        catch (IOException e){
-            System.out.println(e.getMessage());
+        message = messageDate+" "+timeString+" "+message+"\n";
+
+        super.writeMessageToFile(message);
         }
     }
 }

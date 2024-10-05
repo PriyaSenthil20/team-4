@@ -17,20 +17,13 @@ public class SalesReport extends FileGenerator {
             LocalTime localTime = LocalTime.now();
             DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("hh-mm a");
             String timeString = localTime.format(dateTimeFormatter);
-            inputFile=getReportFile(fileDate+"_"+timeString+"_SalesReport");
+            this.inputFile=getReportFile(fileDate+"_"+timeString+"_SalesReport");
         }
         private File getReportFile(String path) {
             return super.getInputFile(path);
         }
         public void writeSalesReport(String message){
-            try(FileWriter fileWriter=new FileWriter(this.inputFile.getName())){
-                PrintWriter writer=new PrintWriter(fileWriter);
-                writer.append(message);
-                writer.flush();
-            }
-            catch (IOException e){
-                System.out.println(e.getMessage());
-            }
+            super.writeMessageToFile(message);
         }
     }
 
