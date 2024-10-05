@@ -29,7 +29,6 @@ public class Logger extends FileGenerator {
 
         message = messageDate+" "+timeString+" "+message+"\n";
 
-        super.writeMessageToFile(message);
+        super.writeMessageToFile(message, true);
         }
     }
-}

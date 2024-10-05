@@ -1,7 +1,6 @@
 package com.techelevator;
 
 import java.math.BigDecimal;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 
@@ -51,7 +50,7 @@ public class ConsoleServices {
             ConsoleServices.printMenu(vm);
             String menuOptionAsString = userInput.nextLine();
 
-            if (isValidWholeNumber(menuOptionAsString)) {
+            if (isValidPosWholeNumber(menuOptionAsString)) {
                 menuOption = Integer.parseInt(menuOptionAsString);
                 switch (activeMenu) {
                     case "main":
@@ -93,14 +92,14 @@ public class ConsoleServices {
                 System.out.println("Please enter the number of dollars you would like to add as a whole number:");
                 String dollarAmountAsString = userInput.nextLine();
                 if (isValidNumber(dollarAmountAsString)) {
-                    if (isValidWholeNumber(dollarAmountAsString)) {
+                    if (isValidPosWholeDollar(dollarAmountAsString)) {
                         BigDecimal dollarAmount = new BigDecimal(dollarAmountAsString);
                         dollarAmount = dollarAmount.setScale(2);
                         vm.setCurrentBalance(vm.getCurrentBalance().add(dollarAmount));
                         vm.writeLogEntry("FEED MONEY: $" + dollarAmount + " $" + vm.getCurrentBalance());
                         isValidInput = true;
                     } else {
-                        System.out.println("I'm sorry, the Vendo-Matic 800 only accepts whole dollars. Please enter a whole number.");
+                        System.out.println("I'm sorry, the Vendo-Matic 800 only accepts whole dollars. Please enter a positive, whole number.");
                     }
                 }
             }
@@ -121,25 +120,25 @@ public class ConsoleServices {
     }
 
     public static void inputProductSelection(VendingMachine vm){
-
         Scanner userInput=new Scanner(System.in);
         System.out.println("Select a Product ID: (ex: A1)");
-        String productID = userInput.nextLine().toUpperCase().trim();
+        String productID = userInput.nextLine();
 
         while(!vm.isValidProductId(productID)){
             System.out.println("Invalid input. Please Enter a valid Product ID:");
-            productID=userInput.nextLine().toUpperCase().trim();
+            productID=userInput.nextLine();
         }
-
+        productID = productID.toUpperCase().trim();
         System.out.println("How many you would like? (Please enter as a whole number)");
         String quantityInput=userInput.nextLine().trim();
-        while (!isValidWholeNumber(quantityInput) || !isValidQuantity(Integer.parseInt(quantityInput))) {
+        InventoryItem itemSelected = vm.getInventory().get(productID);
+        while (!isValidPosWholeNumber(quantityInput) || !isValidQuantity(Integer.parseInt(quantityInput),  itemSelected.getMAXIMUM_SLOT_CAPACITY())) {
             System.out.println("Invalid input. Please enter valid quantity: (Whole number)");
             quantityInput=userInput.nextLine().trim();
         }
 
         int quantity=Integer.parseInt(quantityInput);
-        vm.selectProduct(productID,quantity);
+        vm.selectProduct(itemSelected,quantity);
     }
 
     public static void displayMessage(String category) {
@@ -159,7 +158,7 @@ public class ConsoleServices {
         }
     }
 
-    private static boolean isValidNumber(String input) {
+    public static boolean isValidNumber(String input) {
         boolean isValidNumber = false;
         try {
             BigDecimal decimal = new BigDecimal(input);
@@ -170,25 +169,29 @@ public class ConsoleServices {
 
         return isValidNumber;
     }
-
     /* Start citation
-     * Code adapted from: Google Gemini
+     * Adapted from AI response: Google Gemini
      * Date: 10/4/24
      * Conversation link: https://g.co/gemini/share/23edacd93e55
      */
-    private static boolean isValidWholeNumber(String number) {
+    public static boolean isValidPosWholeNumber(String number) {
+        return number.matches("\\d+");
+    }
+
+
+    public static boolean isValidPosWholeDollar(String number) {
         return number.matches("\\d+(\\.00)?");
     }
     /*
      * End citation
      */
 
-    private static boolean isValidMenuOption(int min, int max, int choice) {
+    public static boolean isValidMenuOption(int min, int max, int choice) {
         return choice >= min && choice <= max;
     }
 
-    private static boolean isValidQuantity(int quantity){
-        return quantity > 0 && quantity < 6;
+    public static boolean isValidQuantity(int quantity, int maxSlotCapacity){
+        return quantity > 0 && quantity <= maxSlotCapacity;
     }
 
 }

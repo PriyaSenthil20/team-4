@@ -23,7 +23,7 @@ public class SalesReport extends FileGenerator {
             return super.getInputFile(path);
         }
         public void writeSalesReport(String message){
-            super.writeMessageToFile(message);
+            super.writeMessageToFile(message, false);
         }
     }
 

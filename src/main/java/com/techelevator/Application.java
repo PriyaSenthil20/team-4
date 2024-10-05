@@ -28,8 +28,8 @@ public class Application {
 						exitProgram = true;
 						break;
 					case 4:
-						vm.generateSalesReport(vm.getInventoryItemList());
-						System.out.println("Sales report generated.");
+						vm.generateSalesReport();
+						System.out.println("The sales report has been generated.");
 						break;
 				}
 
@@ -46,7 +46,6 @@ public class Application {
 						System.out.println("Thank you for using the Vendo-Matic 800.");
 						vm.dispenseChange();
 						vm.setActiveMenu("main");
-						vm.generateSalesReport(vm.getInventoryItemList());
 						break;
 				}
 			}

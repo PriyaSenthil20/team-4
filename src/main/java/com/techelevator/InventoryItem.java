@@ -56,4 +56,7 @@ public class InventoryItem {
         this.numbersSold = numbersSold;
     }
 
+    public int getMAXIMUM_SLOT_CAPACITY() {
+        return MAXIMUM_SLOT_CAPACITY;
+    }
 }

@@ -3,6 +3,7 @@ package com.techelevator;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 
 public class VendingMachine {
@@ -13,24 +14,22 @@ public class VendingMachine {
     private final int QUARTER_VALUE = 25;
     private final int DIME_VALUE = 10;
     private final int NICKEL_VALUE = 5;
-    private int inventory_Size = 0;
     private int[] coinValues = {QUARTER_VALUE, DIME_VALUE, NICKEL_VALUE};
     private String[] coinTypes = {"quarter", "dime", "nickel"};
-    private List<Integer> coinsDue;
     private Logger logger = new Logger();
-    private SalesReport salesReport=new SalesReport();
+    private SalesReport salesReport;
 
     private String activeMenu = "main";
 
     public VendingMachine() {
-        this.inventory = getInventoryMap();
+        this.inventory = createInventoryMap();
     }
 
     //Inventory methods
-    public Map<String, InventoryItem> getInventoryMap() {
+    public Map<String, InventoryItem> createInventoryMap() {
         Map<String, InventoryItem> output = new HashMap<>();
 
-        List<InventoryItem> inventoryItemList = getInventoryItemList();
+        List<InventoryItem> inventoryItemList = createInventoryItemList();
 
         for (InventoryItem item : inventoryItemList) {
             output.put(item.getId(), item);
@@ -39,7 +38,7 @@ public class VendingMachine {
         return output;
     }
 
-    public List<InventoryItem> getInventoryItemList() {
+    public List<InventoryItem> createInventoryItemList() {
         File inventoryFile = new File("vendingmachine.csv");
 
         try (Scanner fileLine = new Scanner(inventoryFile)) {
@@ -58,16 +57,15 @@ public class VendingMachine {
         for (InventoryItem inventoryItem : inventoryItemList) {
             int quantityLeft = inventoryItem.getQuantityRemaining();
             String quantityToPrint = "";
-            String id = inventoryItem.getId();
 
             if (quantityLeft > 0) {
                 quantityToPrint += ", quantity available: " + quantityLeft;
 
             } else if (quantityLeft == 0) {
-                quantityToPrint += " SOLD OUT!";
+                quantityToPrint += " - SOLD OUT!";
             }
 
-            System.out.println(id + " | " + inventoryItem.getName() + " (" + inventoryItem.getEdibleCategory() + ")" + ", $" + inventoryItem.getPrice() + quantityToPrint + "\n");
+            System.out.println(inventoryItem.getId() + " | " + inventoryItem.getName() + " (" + inventoryItem.getEdibleCategory() + ")" + ", $" + inventoryItem.getPrice() + quantityToPrint + "\n");
         }
     }
 
@@ -79,8 +77,7 @@ public class VendingMachine {
 
     }
 
-    public void selectProduct(String productID, int quantity) {
-        InventoryItem itemSelected = inventory.get(productID);
+    public void selectProduct(InventoryItem itemSelected, int quantity) {
         if (itemSelected.getQuantityRemaining() >= quantity) {
             BigDecimal totalSale = itemSelected.getPrice().multiply(BigDecimal.valueOf(quantity));
             if (currentBalance.compareTo(totalSale) != -1) {
@@ -89,7 +86,8 @@ public class VendingMachine {
                 currentBalance = currentBalance.subtract(totalSale);
                 writeLogEntry(itemSelected.getName() + " " + itemSelected.getId() + " $" + totalSale + " $" + currentBalance);
             } else {
-                System.out.println("You do not have enough balance at this point of time for requested item and quantity! \nPlease feed more money or make different order!");
+                System.out.println("You do not have enough balance at this point of time for requested item and quantity! \nTo make this purchase you need to add $"
+                        + totalSale.subtract(currentBalance).setScale(0, RoundingMode.CEILING)+ "." + "\nPlease feed more money or make different order!");
             }
         } else {
             System.out.println("Quantity requested for this item is not available at this point of time!\nPlease change your order!");
@@ -98,22 +96,23 @@ public class VendingMachine {
     }
 
     public void dispenseChange() {
-        coinsDue = new ArrayList<>();
-
         if (currentBalance.compareTo(BigDecimal.valueOf(0)) > 0) {
             System.out.println("Change due: " + currentBalance);
             int currentBalanceInCents = currentBalance.movePointRight(2).intValue();
+
+            List<Integer> coinsDue = new ArrayList<>();
+
             for (int coinValue : coinValues) {
                 coinsDue.add(currentBalanceInCents / coinValue);
                 currentBalanceInCents = currentBalanceInCents % coinValue;
             }
+
             System.out.println("Your change has been dispensed as the following: ");
             for (int i = 0; i < coinsDue.size(); i++) {
                 if (coinsDue.get(i) == 0) {
                     continue;
                 }
                 String coinTypeDue = coinsDue.get(i) > 1 ? coinTypes[i] + "s" : coinTypes[i];
-
                 System.out.println("\t" + coinsDue.get(i) + " " + coinTypeDue);
             }
 
@@ -130,12 +129,22 @@ public class VendingMachine {
 
     //Input validation
     public boolean isValidProductId(String productId) {
-        return inventory.get(productId) != null;
+        return inventory.get(productId.toUpperCase().trim()) != null;
     }
 
     //Logging and reporting methods
     public void writeLogEntry(String message) {
         logger.writeLogEntry(message);
+    }
+
+    public void generateSalesReport(){
+        salesReport = new SalesReport();
+        String reportMessage="";
+        for(InventoryItem item: inventoryItemList){
+            reportMessage += item.getName() + "|" + item.getNumbersSold() + "\n";
+        }
+        reportMessage+="\n**TOTAL SALES** $" + totalSales;
+        salesReport.writeSalesReport(reportMessage);
     }
     
     //Getters and setters
@@ -154,15 +163,8 @@ public class VendingMachine {
     public void setActiveMenu(String activeMenu) {
         this.activeMenu = activeMenu;
     }
-    public void generateSalesReport(List<InventoryItem> updatedInventoryItems){
-        String reportMessage="";
-        for(InventoryItem item:updatedInventoryItems){
-            if(reportMessage.contains(item.getName())){
-                break;
-            }
-            reportMessage+=item.getName() + "|" + item.getNumbersSold() + "\n";
-        }
-        reportMessage+="\n**TOTAL SALES** $" + totalSales;
-        salesReport.writeSalesReport(reportMessage);
+
+    public Map<String, InventoryItem> getInventory() {
+        return inventory;
     }
 }

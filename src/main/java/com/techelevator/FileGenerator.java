@@ -26,8 +26,8 @@ public class FileGenerator {
         return inputFile;
     }
 
-    public void writeMessageToFile(String message) {
-        try(FileWriter fileWriter=new FileWriter(this.inputFile.getName(),true)){
+    public void writeMessageToFile(String message, boolean toAppend) {
+        try(FileWriter fileWriter=new FileWriter(this.inputFile.getName(),toAppend)){
             PrintWriter writer=new PrintWriter(fileWriter);
             writer.append(message);
             writer.flush();
